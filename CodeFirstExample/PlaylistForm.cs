@@ -13,8 +13,9 @@ namespace CodeFirstExample
     public partial class PlaylistForm : Form
     {
         public int CurrentUserId { get; set; }
-        public PlaylistForm()
+        public PlaylistForm(int userId)
         {
+            CurrentUserId = userId;
             InitializeComponent();
         }
 
@@ -22,7 +23,48 @@ namespace CodeFirstExample
         {
 
         }
+        private void LoadRefresh()
+        {
+            using (MusicAppContext ctx = new MusicAppContext())
+            {
+                cbPlaylists.Items.Clear();
+                cbAlbums.Items.Clear();
+                cbSongs.Items.Clear();
+                cbArtists.Items.Clear();
+                dgPlaylist.Rows.Clear();
+                dgSongs.Rows.Clear();
+                var userPlaylists = ctx.Playlists.Where(p => p.UserId == CurrentUserId);
+                foreach (Playlist playlist in userPlaylists)
+                {
+                    ComboboxItem newItem = new ComboboxItem(playlist.PlaylistId, playlist.Name);
+                    cbPlaylists.Items.Add(newItem);
+                }
 
+                cbAlbums.Items.Clear();
+                foreach (Album album in ctx.Albums)
+                {
+                    ComboboxItem newItem = new ComboboxItem(album.AlbumId, album.Name);
+                    cbAlbums.Items.Add(album);
+                }
+                var allSongs = ctx.Songs.GroupJoin(ctx.SongAlbums,
+                                                s => s.SongId,
+                                                sa => sa.SongId,
+                                                (s, sa) => new { s, sa })
+                                            .SelectMany(
+                                                saWithNull => saWithNull.sa.DefaultIfEmpty(),
+                                                (s, saWithNull) => new { }
+                foreach (Song song in ctx.Songs)
+                {
+                    ComboboxItem newItem = new ComboboxItem(song.SongId, song.Title);
+                    cbSongs.Items.Add(newItem);
+                }
+                foreach(Artist artist in ctx.Artists)
+                {
+                    ComboboxItem newItem = new ComboboxItem(artist.ArtistId, artist.Name);
+                    cbArtists.Items.Add(newItem);
+                }
+            }
+        }
         private void btPlayListNew_Click(object sender, EventArgs e)
         {
             cbPlaylists.Text = "<playlist name required>";
@@ -151,6 +193,20 @@ namespace CodeFirstExample
                         MessageBox.Show(cbArtists.Text + " created");
                     }
                 }
+            }
+        }
+        public class ComboboxItem
+        {
+            public object Value { get; set; }
+            public string Text { get; set; }
+            public ComboboxItem(object value, string text)
+            {
+                Value = value;
+                Text = text;
+            }
+            public override string ToString()
+            {
+                return Text;
             }
         }
     }

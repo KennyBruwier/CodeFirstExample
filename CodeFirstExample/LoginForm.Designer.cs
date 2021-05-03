@@ -53,6 +53,7 @@ namespace CodeFirstExample
             this.tbLogPassword.Name = "tbLogPassword";
             this.tbLogPassword.Size = new System.Drawing.Size(174, 20);
             this.tbLogPassword.TabIndex = 6;
+            this.tbLogPassword.Text = "123";
             // 
             // tbLogEmail
             // 
@@ -60,6 +61,7 @@ namespace CodeFirstExample
             this.tbLogEmail.Name = "tbLogEmail";
             this.tbLogEmail.Size = new System.Drawing.Size(174, 20);
             this.tbLogEmail.TabIndex = 5;
+            this.tbLogEmail.Text = "kenny.bruwier@gmail.com";
             // 
             // label1
             // 

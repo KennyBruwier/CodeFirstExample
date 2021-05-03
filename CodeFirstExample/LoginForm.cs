@@ -31,29 +31,7 @@ namespace CodeFirstExample
 
         }
 
-        private void btRegister_Click(object sender, EventArgs e)
-        {
-            if (ValidUser()) 
-            {
-                using (MusicAppContext ctx = new MusicAppContext())
-                {
-                    User nieuwUser = new User()
-                        {
-                            Firstname = regFirstName,
-                            Lastname = regLastName,
-                            Email = regEmail,
-                            Password = regPassword
-                        };
-                    ctx.Users.Add(nieuwUser);
-                    ctx.SaveChanges();
-                    UserLoggedIn = true;
-                    MessageBox.Show("Logged in successfull");
-                    this.Close();
-                }
-            }
-            else
-                MessageBox.Show("Logged in failed");
-        }
+
 
         private bool ValidUser()
         {
@@ -102,23 +80,45 @@ namespace CodeFirstExample
             MessageBox.Show(password + " is an invalid password");
             return false;
         }
-
+        private void btRegister_Click(object sender, EventArgs e)
+        {
+            if (ValidUser())
+            {
+                using (MusicAppContext ctx = new MusicAppContext())
+                {
+                    User nieuwUser = new User()
+                    {
+                        Firstname = regFirstName,
+                        Lastname = regLastName,
+                        Email = regEmail,
+                        Password = regPassword
+                    };
+                    ctx.Users.Add(nieuwUser);
+                    ctx.SaveChanges();
+                }
+                UserLoggedIn = LoginSuccess(regEmail, regPassword);
+            }
+            else
+                MessageBox.Show("Invalid user");
+        }
         private void btLogin_Click(object sender, EventArgs e)
         {
-            if (UserLoggedIn = LoginSuccess())
-            {
-                MessageBox.Show("Logged in successfull");
-                this.Close();
-            }
-            MessageBox.Show("Logged in failed");
+            UserLoggedIn = LoginSuccess(logEmail, logPassword);
         }
 
-        private bool LoginSuccess()
+        private bool LoginSuccess(string email, string password)
         {
             using (MusicAppContext ctx = new MusicAppContext())
             {
-                if (ctx.Users.Any(u => (u.Email.Trim() == logEmail) && (u.Password.Trim() == logPassword)))
+                var currentUser = ctx.Users.FirstOrDefault(u => (u.Email.Trim() == email) && (u.Password.Trim() == password));
+                if (currentUser != null)
+                {
+                    this.Hide();
+                    PlaylistForm newPlaylistForm = new PlaylistForm(currentUser.UserId);
+                    MessageBox.Show("logged in successfull");
+                    newPlaylistForm.Show();
                     return true;
+                }
             }
             MessageBox.Show("connection to database failed or user not found");
             return false;
