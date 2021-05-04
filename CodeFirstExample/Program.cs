@@ -59,6 +59,14 @@ namespace CodeFirstExample
     }
     #region DBContexts
     #region MusicApp
+    /* many-to-many in EF
+     * 
+     * the different ways to do it: 
+     * 
+     *      -fluent api (current in use)
+     *      -InverseProperty
+     *      -Using Data Annotations
+     */
     public class MusicAppContext : DbContext
     {
         public MusicAppContext() : base("name=MusicAppDBConnectionString")
@@ -110,9 +118,6 @@ namespace CodeFirstExample
         public DbSet<Album> Albums { get; set; }
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
-       // public DbSet<PlaylistSong> PlaylistSongs { get; set; }
-       // public DbSet<SongAlbum> SongAlbums { get; set; }
-        // public DbSet<ArtistSong> ArtistSongs { get; set; }
     }
     public class User
     {
@@ -153,7 +158,7 @@ namespace CodeFirstExample
         public virtual ICollection<Interaction> Interactions { get; set; }
         public virtual ICollection<Playlist> Playlists { get; set; }
         //public virtual ICollection<SongAlbum> SongAlbums { get; set; }
-        //[InverseProperty(nameof(Album.Songs))]
+        //[InverseProperty(nameof(Album.Songs))]                            <----  InverseProperty 
         public virtual ICollection<Album>Albums { get; set; }
         public virtual ICollection<Artist>Artists { get; set; }
         public Song()
@@ -173,7 +178,6 @@ namespace CodeFirstExample
         public string Name { get; set; } = "";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdateAt { get; set; } = DateTime.Now;
-       // public virtual ICollection<SongAlbum> SongAlbums { get; set; }
         public virtual ICollection<Song>Songs { get; set; }
         public Album()
         {

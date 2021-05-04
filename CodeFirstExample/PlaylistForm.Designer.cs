@@ -94,6 +94,7 @@ namespace CodeFirstExample
             this.btPlayListDelete.TabIndex = 3;
             this.btPlayListDelete.Text = "Delete";
             this.btPlayListDelete.UseVisualStyleBackColor = true;
+            this.btPlayListDelete.Click += new System.EventHandler(this.btPlayListDelete_Click);
             // 
             // btPlayListSave
             // 

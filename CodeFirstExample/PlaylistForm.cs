@@ -32,9 +32,13 @@ namespace CodeFirstExample
                 DataTable dtPlaylists = new DataTable();
 
                 cbPlaylists.Items.Clear();
+                cbPlaylists.Text = "";
                 cbAlbums.Items.Clear();
+                cbAlbums.Text = "";
                 cbSongs.Items.Clear();
+                cbSongs.Text = "";
                 cbArtists.Items.Clear();
+                cbArtists.Text = "";
                 var userPlaylists = ctx.Playlists.Where(p => p.UserId == CurrentUserId);
                 foreach (Playlist playlist in userPlaylists)
                 {
@@ -60,30 +64,27 @@ namespace CodeFirstExample
                 dtSongs.Columns.Add(new DataColumn("Song Title", typeof(string)));
                 dtSongs.Columns.Add(new DataColumn("Albums", typeof(string)));
                 dtSongs.Columns.Add(new DataColumn("Artists", typeof(string)));
-                var SongsWithAlbums = ctx.Songs.Include(nameof(Song.Albums));
-                foreach (var Song in SongsWithAlbums)
+                var SongsWithAlbums = ctx.Songs;
+                foreach (var Song in SongsWithAlbums.ToList())
                 {
                     List<string> newRow = new List<string>();
                     string albums = "";
                     string artists = "";
                     int iCount = 0;
                     newRow.Add(Song.Title);
-                    foreach (var album in Song.Albums)
+                    foreach (var album in Song.Albums.ToList())
                     {
                         if (iCount++ > 0) albums += ", ";
                         albums += album.Name;
                     }
-
-                    if (iCount > 0) 
-                        newRow.Add(albums);
+                    newRow.Add(albums);
                     iCount = 0;
-                    foreach (var artist in Song.Artists)
+                    foreach (var artist in Song.Artists.ToList())
                     {
                         if (iCount++ > 0) artists += ", ";
                         artists += artist.Name;
                     }
-                    if (iCount > 0)
-                        newRow.Add(artists);
+                    newRow.Add(artists);
                     dtSongs.Rows.Add(newRow.ToArray());
                 }
                 dgSongs.DataSource = dtSongs;
@@ -101,10 +102,27 @@ namespace CodeFirstExample
                 using (MusicAppContext ctx = new MusicAppContext())
                 {
                     var PlaylistWithSongs = ctx.Playlists.FirstOrDefault(p => p.PlaylistId == selectedPlaylist.Key);
-                    List<string> newRow = new List<string>();
-                    foreach (var playlistSong in PlaylistWithSongs.Songs.ToList())
+                    foreach (var Song in PlaylistWithSongs.Songs.ToList())
                     {
-                        dtSongsOfPlaylist.Rows.Add(playlistSong.Title);
+                        List<string> newRow = new List<string>();
+                        string albums = "";
+                        string artists = "";
+                        int iCount = 0;
+                        newRow.Add(Song.Title);
+                        foreach (var album in Song.Albums.ToList())
+                        {
+                            if (iCount++ > 0) albums += ", ";
+                            albums += album.Name;
+                        }
+                        newRow.Add(albums);
+                        iCount = 0;
+                        foreach (var artist in Song.Artists.ToList())
+                        {
+                            if (iCount++ > 0) artists += ", ";
+                            artists += artist.Name;
+                        }
+                        newRow.Add(artists);
+                        dtSongsOfPlaylist.Rows.Add(newRow.ToArray());
                     }
                 }
                 dgPlaylist.DataSource = dtSongsOfPlaylist;
@@ -187,38 +205,43 @@ namespace CodeFirstExample
                 }
             }
         }
-
         private void btAlbumsSave_Click(object sender, EventArgs e)
         {
             if (cbAlbums.Text != "")
             {
-                if (cbAlbums.ValueMember == "")
+                using (MusicAppContext ctx = new MusicAppContext())
                 {
-                    using (MusicAppContext ctx = new MusicAppContext())
+                    Album AlbumToSave = new Album();
+                    bool newSong = false;
+                    string msg = " updated";
+                    if ((cbAlbums.Text != "") && ((cbAlbums.SelectedItem as ComboboxItem) != null))
                     {
-                        Album newAlbum = new Album();
-                        newAlbum.Name = cbAlbums.Text;
-                        ctx.Albums.Add(newAlbum);
-                        ctx.SaveChanges();
-                        MessageBox.Show(cbAlbums.Text + " created");
+                        ComboboxItem AlbumSelected = (cbSongs.SelectedItem as ComboboxItem);
+                        AlbumToSave = ctx.Albums.FirstOrDefault(s => s.AlbumId == AlbumSelected.Key);
                     }
-                    LoadRefresh();
+                    else
+                    {
+                        newSong = true;
+                        msg = " created";
+                    }
+                    AlbumToSave.Name = cbAlbums.Text;
+                    if (newSong) ctx.Albums.Add(AlbumToSave);
+                    ctx.SaveChanges();
+                    MessageBox.Show(cbAlbums.Text + msg);
                 }
+                LoadRefresh();
             }
         }
-
         private void btSongsSave_Click(object sender, EventArgs e)
         {
             if (cbSongs.Text != "")
             {
-                //if (cbSongs.SelectedValue == null)
-                //{
                 bool newSong = false;
                 string msg = " updated";
                 using (MusicAppContext ctx = new MusicAppContext())
                 {
                     Song SongToSave = new Song();
-                    if ((cbSongs.Text != "") && ((cbSongs.SelectedItem as ComboboxItem) != null) && ((cbSongs.SelectedItem as ComboboxItem).Key != null))
+                    if ((cbSongs.Text != "") && ((cbSongs.SelectedItem as ComboboxItem) != null))
                     {
                         ComboboxItem SongSelected = (cbSongs.SelectedItem as ComboboxItem);
                         SongToSave = ctx.Songs.FirstOrDefault(s => s.SongId == SongSelected.Key);
@@ -228,8 +251,8 @@ namespace CodeFirstExample
                     SongToSave.Title = cbSongs.Text;
                     if ((cbAlbums.Text != "") && ((cbAlbums.SelectedItem as ComboboxItem) != null))
                     {
-                        ComboboxItem albumToAttach = cbAlbums.SelectedItem as ComboboxItem;
-                        Album attachAlbum = ctx.Albums.FirstOrDefault(a => a.AlbumId == albumToAttach.Key);
+                        ComboboxItem AlbumSelected = cbAlbums.SelectedItem as ComboboxItem;
+                        Album attachAlbum = ctx.Albums.FirstOrDefault(a => a.AlbumId == AlbumSelected.Key);
                         if (SongToSave.Albums == null) SongToSave.Albums = new List<Album>();
                         SongToSave.Albums.Add(attachAlbum);
                     }
@@ -237,7 +260,8 @@ namespace CodeFirstExample
                     {
                         ComboboxItem artistSelected = cbArtists.SelectedItem as ComboboxItem;
                         Artist artistToAdd = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistSelected.Key);
-                        if (SongToSave.Artists == null)
+                        if (SongToSave.Artists == null) SongToSave.Artists = new List<Artist>();
+                        SongToSave.Artists.Add(artistToAdd);
                     }
                     if (newSong)
                     {
@@ -248,32 +272,39 @@ namespace CodeFirstExample
                     MessageBox.Show(cbSongs.Text + msg);
                 }
                 LoadRefresh();
-                //}
             }
         }
-
         private void btArtistsSave_Click(object sender, EventArgs e)
         {
             if (cbArtists.Text != "")
             {
-                if (cbArtists.ValueMember == "")
+                using (MusicAppContext ctx = new MusicAppContext())
                 {
-                    using (MusicAppContext ctx = new MusicAppContext())
+                    Artist ArtistToSave = new Artist();
+                    bool newArtist = false;
+                    string msg = " updated";
+                    if ((cbArtists.Text != "") && ((cbArtists.SelectedItem as ComboboxItem) != null))
                     {
-                        Artist newArtist = new Artist();
-                        newArtist.Name = cbArtists.Text;
-                        if ((cbSongs.Text != "") && ((cbSongs.SelectedItem as ComboboxItem)!= null))
-                        {
-                            ComboboxItem songSelected = cbSongs.SelectedItem as ComboboxItem;
-                            Song SongToArtist = ctx.Songs.FirstOrDefault(s => s.SongId == songSelected.Key);
-                            newArtist.Songs.Add(SongToArtist);
-                        }
-                        ctx.Artists.Add(newArtist);
-                        ctx.SaveChanges();
-                        MessageBox.Show(cbArtists.Text + " created");
+                        ComboboxItem ArtistSelected = (cbArtists.SelectedItem as ComboboxItem);
+                        ArtistToSave = ctx.Artists.FirstOrDefault(s => s.ArtistId == ArtistSelected.Key);
                     }
-                    LoadRefresh();
+                    else
+                    {
+                        newArtist = true;
+                        msg = " created";
+                    }
+                    ArtistToSave.Name = cbArtists.Text;
+                    if ((cbSongs.Text != "") && ((cbSongs.SelectedItem as ComboboxItem)!= null))
+                    {
+                        ComboboxItem songSelected = cbSongs.SelectedItem as ComboboxItem;
+                        Song SongToArtist = ctx.Songs.FirstOrDefault(s => s.SongId == songSelected.Key);
+                        ArtistToSave.Songs.Add(SongToArtist);
+                    }
+                    if (newArtist) ctx.Artists.Add(ArtistToSave);
+                    ctx.SaveChanges();
+                    MessageBox.Show(cbArtists.Text + msg);
                 }
+                LoadRefresh();
             }
         }
         public class ComboboxItem
@@ -294,12 +325,10 @@ namespace CodeFirstExample
                 return Text;
             }
         }
-
         private void cbPlaylists_SelectedIndexChanged(object sender, EventArgs e)
         {
             RefreshPlaylistGrid();
         }
-
         private void btAddToPlaylist_Click(object sender, EventArgs e)
         {
             if ((cbPlaylists.Text != null) && ((cbPlaylists.SelectedItem as ComboboxItem) != null))
@@ -317,7 +346,6 @@ namespace CodeFirstExample
                     RefreshPlaylistGrid();
                 }
         }
-
         private void btSongsDelete_Click(object sender, EventArgs e)
         {
             if ((cbSongs.Text != null) && (cbSongs.SelectedItem as ComboboxItem) != null)
@@ -332,7 +360,6 @@ namespace CodeFirstExample
                 LoadRefresh();
             }
         }
-
         private void btAlbumsDelete_Click(object sender, EventArgs e)
         {
             if ((cbAlbums.Text != null) && (cbAlbums.SelectedItem as ComboboxItem) != null)
@@ -347,15 +374,16 @@ namespace CodeFirstExample
                 LoadRefresh();
             }
         }
-
         private void EmptySongArtistAlbum()
         {
             ComboboxItem empty = new ComboboxItem();
             cbAlbums.SelectedItem = empty;
+            cbAlbums.Text = "";
             cbArtists.SelectedItem = empty;
+            cbArtists.Text = "";
             cbSongs.SelectedItem = empty;
+            cbSongs.Text = "";
         }
-
         private void btArtistsDelete_Click(object sender, EventArgs e)
         {
             if ((cbArtists.Text != null) && (cbArtists.SelectedItem as ComboboxItem) != null)
@@ -365,6 +393,20 @@ namespace CodeFirstExample
                 {
                     Artist artistToDelete = ctx.Artists.FirstOrDefault(s => s.ArtistId == artistSelected.Key);
                     ctx.Artists.Remove(artistToDelete);
+                    ctx.SaveChanges();
+                }
+                LoadRefresh();
+            }
+        }
+        private void btPlayListDelete_Click(object sender, EventArgs e)
+        {
+            if ((cbPlaylists.Text != null) && (cbPlaylists.SelectedItem as ComboboxItem) != null)
+            {
+                ComboboxItem playlistSelected = cbPlaylists.SelectedItem as ComboboxItem;
+                using (MusicAppContext ctx = new MusicAppContext())
+                {
+                    Playlist playlistToDelete = ctx.Playlists.FirstOrDefault(s => s.PlaylistId == playlistSelected.Key);
+                    ctx.Playlists.Remove(playlistToDelete);
                     ctx.SaveChanges();
                 }
                 LoadRefresh();
