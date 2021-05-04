@@ -51,6 +51,7 @@ namespace CodeFirstExample
             this.label5 = new System.Windows.Forms.Label();
             this.dgPlaylist = new System.Windows.Forms.DataGridView();
             this.dgSongs = new System.Windows.Forms.DataGridView();
+            this.btAddToPlaylist = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgPlaylist)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgSongs)).BeginInit();
             this.SuspendLayout();
@@ -71,6 +72,7 @@ namespace CodeFirstExample
             this.cbPlaylists.Name = "cbPlaylists";
             this.cbPlaylists.Size = new System.Drawing.Size(155, 21);
             this.cbPlaylists.TabIndex = 1;
+            this.cbPlaylists.SelectedIndexChanged += new System.EventHandler(this.cbPlaylists_SelectedIndexChanged);
             this.cbPlaylists.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbPlaylists_KeyDown);
             this.cbPlaylists.MouseClick += new System.Windows.Forms.MouseEventHandler(this.cbPlaylists_MouseClick);
             // 
@@ -105,7 +107,7 @@ namespace CodeFirstExample
             // 
             // btAlbumsSave
             // 
-            this.btAlbumsSave.Location = new System.Drawing.Point(816, 16);
+            this.btAlbumsSave.Location = new System.Drawing.Point(832, 17);
             this.btAlbumsSave.Name = "btAlbumsSave";
             this.btAlbumsSave.Size = new System.Drawing.Size(75, 23);
             this.btAlbumsSave.TabIndex = 10;
@@ -115,16 +117,17 @@ namespace CodeFirstExample
             // 
             // btAlbumsDelete
             // 
-            this.btAlbumsDelete.Location = new System.Drawing.Point(897, 16);
+            this.btAlbumsDelete.Location = new System.Drawing.Point(913, 17);
             this.btAlbumsDelete.Name = "btAlbumsDelete";
             this.btAlbumsDelete.Size = new System.Drawing.Size(75, 23);
             this.btAlbumsDelete.TabIndex = 9;
             this.btAlbumsDelete.Text = "Delete";
             this.btAlbumsDelete.UseVisualStyleBackColor = true;
+            this.btAlbumsDelete.Click += new System.EventHandler(this.btAlbumsDelete_Click);
             // 
             // btAlbumsNew
             // 
-            this.btAlbumsNew.Location = new System.Drawing.Point(735, 16);
+            this.btAlbumsNew.Location = new System.Drawing.Point(751, 17);
             this.btAlbumsNew.Name = "btAlbumsNew";
             this.btAlbumsNew.Size = new System.Drawing.Size(75, 23);
             this.btAlbumsNew.TabIndex = 8;
@@ -135,7 +138,7 @@ namespace CodeFirstExample
             // cbAlbums
             // 
             this.cbAlbums.FormattingEnabled = true;
-            this.cbAlbums.Location = new System.Drawing.Point(565, 18);
+            this.cbAlbums.Location = new System.Drawing.Point(581, 19);
             this.cbAlbums.Name = "cbAlbums";
             this.cbAlbums.Size = new System.Drawing.Size(155, 21);
             this.cbAlbums.TabIndex = 7;
@@ -145,7 +148,7 @@ namespace CodeFirstExample
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(515, 21);
+            this.label3.Location = new System.Drawing.Point(531, 22);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(41, 13);
             this.label3.TabIndex = 6;
@@ -153,7 +156,7 @@ namespace CodeFirstExample
             // 
             // btSongsSave
             // 
-            this.btSongsSave.Location = new System.Drawing.Point(816, 43);
+            this.btSongsSave.Location = new System.Drawing.Point(832, 44);
             this.btSongsSave.Name = "btSongsSave";
             this.btSongsSave.Size = new System.Drawing.Size(75, 23);
             this.btSongsSave.TabIndex = 15;
@@ -163,16 +166,17 @@ namespace CodeFirstExample
             // 
             // btSongsDelete
             // 
-            this.btSongsDelete.Location = new System.Drawing.Point(897, 43);
+            this.btSongsDelete.Location = new System.Drawing.Point(913, 44);
             this.btSongsDelete.Name = "btSongsDelete";
             this.btSongsDelete.Size = new System.Drawing.Size(75, 23);
             this.btSongsDelete.TabIndex = 14;
             this.btSongsDelete.Text = "Delete";
             this.btSongsDelete.UseVisualStyleBackColor = true;
+            this.btSongsDelete.Click += new System.EventHandler(this.btSongsDelete_Click);
             // 
             // btSongsNew
             // 
-            this.btSongsNew.Location = new System.Drawing.Point(735, 43);
+            this.btSongsNew.Location = new System.Drawing.Point(751, 44);
             this.btSongsNew.Name = "btSongsNew";
             this.btSongsNew.Size = new System.Drawing.Size(75, 23);
             this.btSongsNew.TabIndex = 13;
@@ -183,7 +187,7 @@ namespace CodeFirstExample
             // cbSongs
             // 
             this.cbSongs.FormattingEnabled = true;
-            this.cbSongs.Location = new System.Drawing.Point(565, 45);
+            this.cbSongs.Location = new System.Drawing.Point(581, 46);
             this.cbSongs.Name = "cbSongs";
             this.cbSongs.Size = new System.Drawing.Size(155, 21);
             this.cbSongs.TabIndex = 12;
@@ -193,7 +197,7 @@ namespace CodeFirstExample
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(515, 48);
+            this.label4.Location = new System.Drawing.Point(531, 49);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(37, 13);
             this.label4.TabIndex = 11;
@@ -201,7 +205,7 @@ namespace CodeFirstExample
             // 
             // btArtistsSave
             // 
-            this.btArtistsSave.Location = new System.Drawing.Point(816, 70);
+            this.btArtistsSave.Location = new System.Drawing.Point(832, 71);
             this.btArtistsSave.Name = "btArtistsSave";
             this.btArtistsSave.Size = new System.Drawing.Size(75, 23);
             this.btArtistsSave.TabIndex = 20;
@@ -211,16 +215,17 @@ namespace CodeFirstExample
             // 
             // btArtistsDelete
             // 
-            this.btArtistsDelete.Location = new System.Drawing.Point(897, 70);
+            this.btArtistsDelete.Location = new System.Drawing.Point(913, 71);
             this.btArtistsDelete.Name = "btArtistsDelete";
             this.btArtistsDelete.Size = new System.Drawing.Size(75, 23);
             this.btArtistsDelete.TabIndex = 19;
             this.btArtistsDelete.Text = "Delete";
             this.btArtistsDelete.UseVisualStyleBackColor = true;
+            this.btArtistsDelete.Click += new System.EventHandler(this.btArtistsDelete_Click);
             // 
             // btArtistsNew
             // 
-            this.btArtistsNew.Location = new System.Drawing.Point(735, 70);
+            this.btArtistsNew.Location = new System.Drawing.Point(751, 71);
             this.btArtistsNew.Name = "btArtistsNew";
             this.btArtistsNew.Size = new System.Drawing.Size(75, 23);
             this.btArtistsNew.TabIndex = 18;
@@ -231,7 +236,7 @@ namespace CodeFirstExample
             // cbArtists
             // 
             this.cbArtists.FormattingEnabled = true;
-            this.cbArtists.Location = new System.Drawing.Point(565, 72);
+            this.cbArtists.Location = new System.Drawing.Point(581, 73);
             this.cbArtists.Name = "cbArtists";
             this.cbArtists.Size = new System.Drawing.Size(155, 21);
             this.cbArtists.TabIndex = 17;
@@ -241,7 +246,7 @@ namespace CodeFirstExample
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(515, 75);
+            this.label5.Location = new System.Drawing.Point(531, 76);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(35, 13);
             this.label5.TabIndex = 16;
@@ -259,16 +264,27 @@ namespace CodeFirstExample
             // dgSongs
             // 
             this.dgSongs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgSongs.Location = new System.Drawing.Point(520, 109);
+            this.dgSongs.Location = new System.Drawing.Point(536, 110);
             this.dgSongs.Name = "dgSongs";
             this.dgSongs.Size = new System.Drawing.Size(454, 197);
             this.dgSongs.TabIndex = 22;
+            // 
+            // btAddToPlaylist
+            // 
+            this.btAddToPlaylist.Location = new System.Drawing.Point(483, 149);
+            this.btAddToPlaylist.Name = "btAddToPlaylist";
+            this.btAddToPlaylist.Size = new System.Drawing.Size(47, 40);
+            this.btAddToPlaylist.TabIndex = 23;
+            this.btAddToPlaylist.Text = "<<<<";
+            this.btAddToPlaylist.UseVisualStyleBackColor = true;
+            this.btAddToPlaylist.Click += new System.EventHandler(this.btAddToPlaylist_Click);
             // 
             // PlaylistForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(994, 364);
+            this.ClientSize = new System.Drawing.Size(1036, 364);
+            this.Controls.Add(this.btAddToPlaylist);
             this.Controls.Add(this.dgSongs);
             this.Controls.Add(this.dgPlaylist);
             this.Controls.Add(this.btArtistsSave);
@@ -324,5 +340,6 @@ namespace CodeFirstExample
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DataGridView dgPlaylist;
         private System.Windows.Forms.DataGridView dgSongs;
+        private System.Windows.Forms.Button btAddToPlaylist;
     }
 }

@@ -66,25 +66,53 @@ namespace CodeFirstExample
             Database.SetInitializer(new DropCreateDatabaseIfModelChanges<MusicAppContext>());
             this.Configuration.LazyLoadingEnabled = true;   // Entity framework staat lazyloading bij default aan;
         }
-        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        //{
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
 
-        //    modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+            //modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
 
-        //    modelBuilder.Entity<ArtistSong>()
-        //       .HasRequired(f => f.Song)
-        //       .WithRequiredDependent()
-        //       .WillCascadeOnDelete(false);
-        //}
+            //modelBuilder.Entity<ArtistSong>()
+            //   .HasRequired(f => f.Song)
+            //   .WithRequiredDependent()
+            //   .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Album>()
+                .HasMany(a => a.Songs)
+                .WithMany(s => s.Albums)
+                .Map(cs =>
+                {
+                    cs.MapLeftKey("AlbumId");
+                    cs.MapRightKey("SongId");
+                    cs.ToTable("AlbumSongs");
+                });
+            modelBuilder.Entity<Song>()
+                .HasMany(s => s.Artists)
+                .WithMany(a => a.Songs)
+                .Map(cs =>
+                {
+                    cs.MapLeftKey("SongId");
+                    cs.MapRightKey("ArtistId");
+                    cs.ToTable("ArtistSongs");
+                });
+            modelBuilder.Entity<Song>()
+                .HasMany(s => s.Playlists)
+                .WithMany(p => p.Songs)
+                .Map(cs =>
+                {
+                    cs.MapLeftKey("SongId");
+                    cs.MapRightKey("PlaylistId");
+                    cs.ToTable("PlaylistSongs");
+                });
+        }
         public DbSet<User> Users { get; set; }
         public DbSet<Interaction> Interactions { get; set; }
         public DbSet<Song> Songs { get; set; }
         public DbSet<Album> Albums { get; set; }
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
-        public DbSet<PlaylistSong> PlaylistSongs { get; set; }
-        public DbSet<SongAlbum> SongAlbums { get; set; }
-        public DbSet<ArtistSong> ArtistSongs { get; set; }
+       // public DbSet<PlaylistSong> PlaylistSongs { get; set; }
+       // public DbSet<SongAlbum> SongAlbums { get; set; }
+        // public DbSet<ArtistSong> ArtistSongs { get; set; }
     }
     public class User
     {
@@ -106,13 +134,16 @@ namespace CodeFirstExample
                                                                     //  why virtual? it enables Lazy loading and will be overridden.   
                                                                     //  lazy loading = the "SQL query" loads only the data we need instead of loading all data (+relations) and filter afterwards.
         virtual public ICollection<Interaction>Interactions { get; set; }
+        public User()
+        {
+            Playlists = new HashSet<Playlist>();
+            Interactions = new HashSet<Interaction>();
+        }
     }
     public class Song
     {
         [Key]
         public int SongId { get; set; }
-        //public int ArtistId { get; set; }
-        //public virtual Artist Artist { get; set; }
         [MaxLength(50)]
         [Required]
         public string Title { get; set; } = "";
@@ -120,9 +151,18 @@ namespace CodeFirstExample
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdateAt { get; set; } = DateTime.Now;
         public virtual ICollection<Interaction> Interactions { get; set; }
-        public virtual ICollection<PlaylistSong> PlaylistSongs { get; set; }
-        public virtual ICollection<SongAlbum> SongAlbums { get; set; }
-        public virtual ICollection<ArtistSong> ArtistSongs { get; set; }
+        public virtual ICollection<Playlist> Playlists { get; set; }
+        //public virtual ICollection<SongAlbum> SongAlbums { get; set; }
+        //[InverseProperty(nameof(Album.Songs))]
+        public virtual ICollection<Album>Albums { get; set; }
+        public virtual ICollection<Artist>Artists { get; set; }
+        public Song()
+        {
+            Albums = new HashSet<Album>();
+            Artists = new HashSet<Artist>();
+            Playlists = new HashSet<Playlist>();
+            Interactions = new HashSet<Interaction>();
+        }
     }
     public class Album
     {
@@ -133,7 +173,12 @@ namespace CodeFirstExample
         public string Name { get; set; } = "";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdateAt { get; set; } = DateTime.Now;
-        public virtual ICollection<SongAlbum> SongAlbums { get; set; }
+       // public virtual ICollection<SongAlbum> SongAlbums { get; set; }
+        public virtual ICollection<Song>Songs { get; set; }
+        public Album()
+        {
+            Songs = new HashSet<Song>();
+        }
     }
     public class Artist
     {
@@ -144,7 +189,11 @@ namespace CodeFirstExample
         public string Name { get; set; } = "";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdateAt { get; set; } = DateTime.Now;
-        public virtual ICollection<ArtistSong> ArtistSongs { get; set; }
+        public virtual ICollection<Song> Songs { get; set; }
+        public Artist()
+        {
+            Songs = new HashSet<Song>();
+        }
     }
     public class Playlist
     {
@@ -157,7 +206,11 @@ namespace CodeFirstExample
         public string Name { get; set; } = "";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdateAt { get; set; } = DateTime.Now;
-        public virtual ICollection<PlaylistSong> PlaylistSongs { get; set; }
+        public virtual ICollection<Song> Songs { get; set; }
+        public Playlist()
+        {
+            Songs = new HashSet<Song>();
+        }
     }
     public class Interaction
     {
@@ -175,7 +228,7 @@ namespace CodeFirstExample
         public DateTime UpdateAt { get; set; } = DateTime.Now;
     }
 
-    // --------------------- Koppeltabellen ------------------------------------
+    // --------------------- Koppeltabellen / Using Data Annotations ------------------------------------
 
     public class SongAlbum
     {

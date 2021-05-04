@@ -53,7 +53,7 @@ namespace CodeFirstExample
             this.tbLogPassword.Name = "tbLogPassword";
             this.tbLogPassword.Size = new System.Drawing.Size(174, 20);
             this.tbLogPassword.TabIndex = 6;
-            this.tbLogPassword.Text = "123";
+            this.tbLogPassword.Text = "123azeAZE!";
             // 
             // tbLogEmail
             // 
